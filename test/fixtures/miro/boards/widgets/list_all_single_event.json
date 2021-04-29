@@ -1,0 +1,41 @@
+{
+  "type" : "collection",
+  "data" : [ {
+    "id" : "3074457357258884554",
+    "style" : {
+      "padding" : null,
+      "backgroundOpacity" : null,
+      "backgroundColor" : "#ff9d48",
+      "borderColor" : null,
+      "borderStyle" : null,
+      "borderOpacity" : null,
+      "borderWidth" : null,
+      "fontSize" : 30,
+      "fontFamily" : "OpenSans",
+      "textColor" : null,
+      "textAlign" : "center",
+      "textAlignVertical" : "middle",
+      "shapeType" : null
+    },
+    "text" : "<p>Something Happened</p>",
+    "x" : 234.0,
+    "y" : -674.0,
+    "width" : 199.0,
+    "height" : 228.0,
+    "scale" : 0.54,
+    "type" : "sticker",
+    "createdAt" : "2021-04-14T16:10:46Z",
+    "modifiedAt" : "2021-04-28T18:47:08Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  } ],
+  "size" : 1
+}

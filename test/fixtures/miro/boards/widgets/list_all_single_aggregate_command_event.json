@@ -1,0 +1,171 @@
+{
+  "type" : "collection",
+  "data" : [ {
+    "id" : "3074457357258884554",
+    "style" : {
+      "padding" : null,
+      "backgroundOpacity" : null,
+      "backgroundColor" : "#ff9d48",
+      "borderColor" : null,
+      "borderStyle" : null,
+      "borderOpacity" : null,
+      "borderWidth" : null,
+      "fontSize" : 30,
+      "fontFamily" : "OpenSans",
+      "textColor" : null,
+      "textAlign" : "center",
+      "textAlignVertical" : "middle",
+      "shapeType" : null
+    },
+    "text" : "<p>Something Happened</p>",
+    "x" : 234.0,
+    "y" : -679.101860465116,
+    "width" : 199.0,
+    "height" : 228.0,
+    "scale" : 0.54,
+    "type" : "sticker",
+    "createdAt" : "2021-04-14T16:10:46Z",
+    "modifiedAt" : "2021-04-29T18:36:51Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358069703129",
+    "style" : {
+      "padding" : null,
+      "backgroundOpacity" : null,
+      "backgroundColor" : "#f5d128",
+      "borderColor" : null,
+      "borderStyle" : null,
+      "borderOpacity" : null,
+      "borderWidth" : null,
+      "fontSize" : 32,
+      "fontFamily" : "OpenSans",
+      "textColor" : null,
+      "textAlign" : "center",
+      "textAlignVertical" : "middle",
+      "shapeType" : null
+    },
+    "text" : "<p>An Aggregate</p>",
+    "x" : 27.1681497593001,
+    "y" : -679.101860465116,
+    "width" : 199.0,
+    "height" : 228.0,
+    "scale" : 0.54,
+    "type" : "sticker",
+    "createdAt" : "2021-04-29T18:36:29Z",
+    "modifiedAt" : "2021-04-29T18:37:14Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358069703199",
+    "startWidget" : {
+      "id" : "3074457358069703129"
+    },
+    "endWidget" : {
+      "id" : "3074457357258884554"
+    },
+    "style" : {
+      "borderColor" : "#000000",
+      "borderStyle" : "normal",
+      "borderWidth" : 1.0,
+      "lineEndType" : "opaque_block",
+      "lineStartType" : "none",
+      "lineType" : "bezier"
+    },
+    "type" : "line",
+    "createdAt" : "2021-04-29T18:36:48Z",
+    "modifiedAt" : "2021-04-29T18:36:48Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358069703218",
+    "style" : {
+      "padding" : null,
+      "backgroundOpacity" : null,
+      "backgroundColor" : "#a6ccf5",
+      "borderColor" : null,
+      "borderStyle" : null,
+      "borderOpacity" : null,
+      "borderWidth" : null,
+      "fontSize" : 30,
+      "fontFamily" : "OpenSans",
+      "textColor" : null,
+      "textAlign" : "center",
+      "textAlignVertical" : "middle",
+      "shapeType" : null
+    },
+    "text" : "<p>Do Something</p>",
+    "x" : -195.123416185819,
+    "y" : -679.101860465116,
+    "width" : 199.0,
+    "height" : 228.0,
+    "scale" : 0.54,
+    "type" : "sticker",
+    "createdAt" : "2021-04-29T18:36:53Z",
+    "modifiedAt" : "2021-04-29T18:37:12Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358069703259",
+    "startWidget" : {
+      "id" : "3074457358069703218"
+    },
+    "endWidget" : {
+      "id" : "3074457358069703129"
+    },
+    "style" : {
+      "borderColor" : "#000000",
+      "borderStyle" : "normal",
+      "borderWidth" : 1.0,
+      "lineEndType" : "opaque_block",
+      "lineStartType" : "none",
+      "lineType" : "bezier"
+    },
+    "type" : "line",
+    "createdAt" : "2021-04-29T18:37:06Z",
+    "modifiedAt" : "2021-04-29T18:37:06Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  } ],
+  "size" : 5
+}

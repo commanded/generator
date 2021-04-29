@@ -1,0 +1,366 @@
+{
+  "type" : "collection",
+  "data" : [ {
+    "id" : "3074457357258884554",
+    "style" : {
+      "padding" : null,
+      "backgroundOpacity" : null,
+      "backgroundColor" : "#ff9d48",
+      "borderColor" : null,
+      "borderStyle" : null,
+      "borderOpacity" : null,
+      "borderWidth" : null,
+      "fontSize" : 58,
+      "fontFamily" : "OpenSans",
+      "textColor" : null,
+      "textAlign" : "center",
+      "textAlignVertical" : "middle",
+      "shapeType" : null
+    },
+    "text" : "<p>Event</p>",
+    "x" : 223.230429449623,
+    "y" : -679.101860465116,
+    "width" : 199.0,
+    "height" : 228.0,
+    "scale" : 0.54,
+    "type" : "sticker",
+    "createdAt" : "2021-04-14T16:10:46Z",
+    "modifiedAt" : "2021-04-29T19:49:32Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358069703129",
+    "style" : {
+      "padding" : null,
+      "backgroundOpacity" : null,
+      "backgroundColor" : "#f5d128",
+      "borderColor" : null,
+      "borderStyle" : null,
+      "borderOpacity" : null,
+      "borderWidth" : null,
+      "fontSize" : 32,
+      "fontFamily" : "OpenSans",
+      "textColor" : null,
+      "textAlign" : "center",
+      "textAlignVertical" : "middle",
+      "shapeType" : null
+    },
+    "text" : "<p>Aggregate</p>",
+    "x" : 27.1681497593001,
+    "y" : -679.101860465116,
+    "width" : 199.0,
+    "height" : 228.0,
+    "scale" : 0.54,
+    "type" : "sticker",
+    "createdAt" : "2021-04-29T18:36:29Z",
+    "modifiedAt" : "2021-04-29T19:37:54Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358069703199",
+    "startWidget" : {
+      "id" : "3074457358069703129"
+    },
+    "endWidget" : {
+      "id" : "3074457357258884554"
+    },
+    "style" : {
+      "borderColor" : "#000000",
+      "borderStyle" : "normal",
+      "borderWidth" : 1.0,
+      "lineEndType" : "opaque_block",
+      "lineStartType" : "none",
+      "lineType" : "bezier"
+    },
+    "type" : "line",
+    "createdAt" : "2021-04-29T18:36:48Z",
+    "modifiedAt" : "2021-04-29T18:36:48Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358069703218",
+    "style" : {
+      "padding" : null,
+      "backgroundOpacity" : null,
+      "backgroundColor" : "#a6ccf5",
+      "borderColor" : null,
+      "borderStyle" : null,
+      "borderOpacity" : null,
+      "borderWidth" : null,
+      "fontSize" : 30,
+      "fontFamily" : "OpenSans",
+      "textColor" : null,
+      "textAlign" : "center",
+      "textAlignVertical" : "middle",
+      "shapeType" : null
+    },
+    "text" : "<p>Command</p>",
+    "x" : -177.892103305216,
+    "y" : -679.101860465116,
+    "width" : 199.0,
+    "height" : 228.0,
+    "scale" : 0.54,
+    "type" : "sticker",
+    "createdAt" : "2021-04-29T18:36:53Z",
+    "modifiedAt" : "2021-04-29T19:49:29Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358069703259",
+    "startWidget" : {
+      "id" : "3074457358069703218"
+    },
+    "endWidget" : {
+      "id" : "3074457358069703129"
+    },
+    "style" : {
+      "borderColor" : "#000000",
+      "borderStyle" : "normal",
+      "borderWidth" : 1.0,
+      "lineEndType" : "opaque_block",
+      "lineStartType" : "none",
+      "lineType" : "bezier"
+    },
+    "type" : "line",
+    "createdAt" : "2021-04-29T18:37:06Z",
+    "modifiedAt" : "2021-04-29T18:37:06Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358072412785",
+    "style" : {
+      "padding" : null,
+      "backgroundOpacity" : null,
+      "backgroundColor" : "#d5f692",
+      "borderColor" : null,
+      "borderStyle" : null,
+      "borderOpacity" : null,
+      "borderWidth" : null,
+      "fontSize" : 32,
+      "fontFamily" : "OpenSans",
+      "textColor" : null,
+      "textAlign" : "center",
+      "textAlignVertical" : "middle",
+      "shapeType" : null
+    },
+    "text" : "<p>Projection</p>",
+    "x" : 394.035574702805,
+    "y" : -818.918201024643,
+    "width" : 199.0,
+    "height" : 228.0,
+    "scale" : 0.54,
+    "type" : "sticker",
+    "createdAt" : "2021-04-29T19:37:22Z",
+    "modifiedAt" : "2021-04-29T19:42:32Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358072412795",
+    "startWidget" : {
+      "id" : "3074457357258884554"
+    },
+    "endWidget" : {
+      "id" : "3074457358072412785"
+    },
+    "style" : {
+      "borderColor" : "#000000",
+      "borderStyle" : "normal",
+      "borderWidth" : 1.0,
+      "lineEndType" : "opaque_block",
+      "lineStartType" : "none",
+      "lineType" : "bezier"
+    },
+    "type" : "line",
+    "createdAt" : "2021-04-29T19:37:28Z",
+    "modifiedAt" : "2021-04-29T19:37:30Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358072412873",
+    "style" : {
+      "padding" : null,
+      "backgroundOpacity" : null,
+      "backgroundColor" : "#ea94bb",
+      "borderColor" : null,
+      "borderStyle" : null,
+      "borderOpacity" : null,
+      "borderWidth" : null,
+      "fontSize" : 40,
+      "fontFamily" : "OpenSans",
+      "textColor" : null,
+      "textAlign" : "center",
+      "textAlignVertical" : "middle",
+      "shapeType" : null
+    },
+    "text" : "<p>Event Handler</p>",
+    "x" : 394.035574702805,
+    "y" : -541.063280824907,
+    "width" : 199.0,
+    "height" : 228.0,
+    "scale" : 0.54,
+    "type" : "sticker",
+    "createdAt" : "2021-04-29T19:38:03Z",
+    "modifiedAt" : "2021-04-29T19:50:22Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358072412900",
+    "startWidget" : {
+      "id" : "3074457357258884554"
+    },
+    "endWidget" : {
+      "id" : "3074457358072412873"
+    },
+    "style" : {
+      "borderColor" : "#000000",
+      "borderStyle" : "normal",
+      "borderWidth" : 1.0,
+      "lineEndType" : "opaque_block",
+      "lineStartType" : "none",
+      "lineType" : "bezier"
+    },
+    "type" : "line",
+    "createdAt" : "2021-04-29T19:38:19Z",
+    "modifiedAt" : "2021-04-29T19:38:19Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358072691635",
+    "style" : {
+      "padding" : null,
+      "backgroundOpacity" : null,
+      "backgroundColor" : "#be88c7",
+      "borderColor" : null,
+      "borderStyle" : null,
+      "borderOpacity" : null,
+      "borderWidth" : null,
+      "fontSize" : 36,
+      "fontFamily" : "OpenSans",
+      "textColor" : null,
+      "textAlign" : "center",
+      "textAlignVertical" : "middle",
+      "shapeType" : null
+    },
+    "text" : "<p>Process Manager</p>",
+    "x" : 394.035574702805,
+    "y" : -679.101860465116,
+    "width" : 199.0,
+    "height" : 228.0,
+    "scale" : 0.54,
+    "type" : "sticker",
+    "createdAt" : "2021-04-29T19:43:13Z",
+    "modifiedAt" : "2021-04-29T19:49:28Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358072927935",
+    "startWidget" : {
+      "id" : "3074457357258884554"
+    },
+    "endWidget" : {
+      "id" : "3074457358072691635"
+    },
+    "style" : {
+      "borderColor" : "#000000",
+      "borderStyle" : "normal",
+      "borderWidth" : 1.0,
+      "lineEndType" : "opaque_block",
+      "lineStartType" : "none",
+      "lineType" : "bezier"
+    },
+    "type" : "line",
+    "createdAt" : "2021-04-29T19:49:26Z",
+    "modifiedAt" : "2021-04-29T19:49:26Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  } ],
+  "size" : 11
+}
