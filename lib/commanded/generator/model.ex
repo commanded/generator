@@ -17,4 +17,20 @@ defmodule Commanded.Generator.Model do
     process_managers: [],
     projections: []
   ]
+
+  def new(namespace) do
+    %Model{namespace: namespace}
+  end
+
+  def find_event(%Model{} = model, id) do
+    %Model{aggregates: aggregates, events: events} = model
+
+    aggregates
+    |> Stream.flat_map(fn %Aggregate{events: events} -> events end)
+    |> Stream.concat(events)
+    |> Enum.find(fn
+      %Event{id: ^id} -> true
+      %Event{} -> false
+    end)
+  end
 end

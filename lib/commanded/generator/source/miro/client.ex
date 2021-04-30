@@ -24,6 +24,12 @@ defmodule Commanded.Generator.Source.Miro.Client do
       {:ok, %Tesla.Env{status: 200, body: %{"type" => "collection", "data" => data}}} ->
         {:ok, data}
 
+      {:ok, %Tesla.Env{body: %{"message" => message}}} ->
+        {:error, message}
+
+      {:ok, %Tesla.Env{} = env} ->
+        {:error, env}
+
       reply ->
         reply
     end
