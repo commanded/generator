@@ -58,12 +58,7 @@ defmodule Commanded.Generator.Source.MiroTest do
                      ]
                    }
                  ],
-                 events: [
-                   %Event{
-                     name: "Something Happened",
-                     module: MyApp.AnAggregate.Events.SomethingHappened
-                   }
-                 ]
+                 events: []
                },
                model
              )
@@ -192,6 +187,64 @@ defmodule Commanded.Generator.Source.MiroTest do
                        %Field{name: "Field A", field: :field_a},
                        %Field{name: "Field B", field: :field_b},
                        %Field{name: "Field C", field: :field_c}
+                     ]
+                   }
+                 ]
+               },
+               model
+             )
+    end
+
+    test "with circular references" do
+      mock_request("boards/widgets/list_all_circular_refs.json")
+
+      {:ok, model} = Miro.build(namespace: MyApp, board_id: "o9J_lJibPCc=")
+
+      assert match?(
+               %Model{
+                 namespace: MyApp,
+                 aggregates: [
+                   %Aggregate{
+                     name: "Aggregate",
+                     module: MyApp.Aggregate,
+                     commands: [
+                       %Command{name: "Command A", module: MyApp.Aggregate.Commands.CommandA},
+                       %Command{name: "Command B", module: MyApp.Aggregate.Commands.CommandB}
+                     ],
+                     events: [
+                       %Event{name: "Event A", module: MyApp.Aggregate.Events.EventA},
+                       %Event{name: "Event B", module: MyApp.Aggregate.Events.EventB}
+                     ]
+                   }
+                 ],
+                 event_handlers: [
+                   %EventHandler{
+                     name: "Event Handler",
+                     module: MyApp.Handlers.EventHandler,
+                     events: [
+                       %Event{name: "Event A", module: MyApp.Aggregate.Events.EventA},
+                       %Event{name: "Event B", module: MyApp.Aggregate.Events.EventB}
+                     ]
+                   }
+                 ],
+                 process_managers: [
+                   %ProcessManager{
+                     name: "Process Manager",
+                     module: MyApp.Processes.ProcessManager,
+                     events: [
+                       %Event{name: "Event A", module: MyApp.Aggregate.Events.EventA},
+                       %Event{name: "Event B", module: MyApp.Aggregate.Events.EventB}
+                     ]
+                   }
+                 ],
+                 projections: [
+                   %Projection{
+                     name: "Projection",
+                     module: MyApp.Projections.Projection,
+                     fields: [],
+                     events: [
+                       %Event{name: "Event A", module: MyApp.Aggregate.Events.EventA},
+                       %Event{name: "Event B", module: MyApp.Aggregate.Events.EventB}
                      ]
                    }
                  ]

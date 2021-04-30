@@ -9,4 +9,17 @@ defmodule Commanded.Generator.Model.ProcessManager do
         }
 
   defstruct [:name, :module, events: []]
+
+  def add_event(%ProcessManager{} = process_manager, %Event{} = event) do
+    %ProcessManager{events: events} = process_manager
+    %Event{name: name} = event
+
+    events =
+      Enum.reject(events, fn
+        %Event{name: ^name} -> true
+        %Event{} -> false
+      end)
+
+    %ProcessManager{process_manager | events: Enum.sort_by([event | events], & &1.name)}
+  end
 end

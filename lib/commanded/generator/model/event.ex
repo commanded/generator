@@ -3,11 +3,16 @@ defmodule Commanded.Generator.Model.Event do
   alias __MODULE__
 
   @type t :: %Event{
-          id: String.t(),
           name: String.t(),
           module: atom(),
           fields: list(Field.t())
         }
 
-  defstruct [:id, :name, :module, fields: []]
+  defstruct [:name, :module, fields: []]
+
+  def new(namespace, name, fields \\ []) do
+    module = Module.concat([namespace, String.replace(name, " ", "")])
+
+    %Event{name: name, module: module, fields: fields}
+  end
 end

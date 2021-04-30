@@ -1,5 +1,13 @@
 defmodule Commanded.Generator.Model do
-  alias Commanded.Generator.Model.{Aggregate, Event}
+  alias Commanded.Generator.Model.{
+    Aggregate,
+    Command,
+    Event,
+    EventHandler,
+    ProcessManager,
+    Projection
+  }
+
   alias __MODULE__
 
   @type t :: %Model{
@@ -22,15 +30,108 @@ defmodule Commanded.Generator.Model do
     %Model{namespace: namespace}
   end
 
-  def find_event(%Model{} = model, id) do
+  def add_event_handler(%Model{} = model, %EventHandler{} = event_handler) do
+    %Model{event_handlers: event_handlers} = model
+    %EventHandler{name: name} = event_handler
+
+    event_handlers =
+      Enum.reject(event_handlers, fn
+        %EventHandler{name: ^name} -> true
+        %EventHandler{} -> false
+      end)
+
+    %Model{model | event_handlers: Enum.sort_by([event_handler | event_handlers], & &1.name)}
+  end
+
+  def add_process_manager(%Model{} = model, %ProcessManager{} = process_manager) do
+    %Model{process_managers: process_managers} = model
+    %ProcessManager{name: name} = process_manager
+
+    process_managers =
+      Enum.reject(process_managers, fn
+        %ProcessManager{name: ^name} -> true
+        %ProcessManager{} -> false
+      end)
+
+    %Model{
+      model
+      | process_managers: Enum.sort_by([process_manager | process_managers], & &1.name)
+    }
+  end
+
+  def add_projection(%Model{} = model, %Projection{} = projection) do
+    %Model{projections: projections} = model
+    %Projection{name: name} = projection
+
+    projections =
+      Enum.reject(projections, fn
+        %Projection{name: ^name} -> true
+        %Projection{} -> false
+      end)
+
+    %Model{
+      model
+      | projections: Enum.sort_by([projection | projections], & &1.name)
+    }
+  end
+
+  def find_aggregate(%Model{} = model, name) do
+    %Model{aggregates: aggregates} = model
+
+    Enum.find(aggregates, fn
+      %Aggregate{name: ^name} -> true
+      %Aggregate{} -> false
+    end)
+  end
+
+  def find_command(%Model{} = model, name) do
+    %Model{aggregates: aggregates, commands: commands} = model
+
+    aggregates
+    |> Stream.flat_map(fn %Aggregate{commands: commands} -> commands end)
+    |> Stream.concat(commands)
+    |> Enum.find(fn
+      %Command{name: ^name} -> true
+      %Command{} -> false
+    end)
+  end
+
+  def find_event(%Model{} = model, name) do
     %Model{aggregates: aggregates, events: events} = model
 
     aggregates
     |> Stream.flat_map(fn %Aggregate{events: events} -> events end)
     |> Stream.concat(events)
     |> Enum.find(fn
-      %Event{id: ^id} -> true
+      %Event{name: ^name} -> true
       %Event{} -> false
+    end)
+  end
+
+  def find_event_handler(%Model{} = model, name) do
+    %Model{event_handlers: event_handlers} = model
+
+    Enum.find(event_handlers, fn
+      %EventHandler{name: ^name} -> true
+      %EventHandler{} -> false
+    end)
+  end
+
+  def find_process_manager(%Model{} = model, name) do
+    %Model{process_managers: process_managers} = model
+
+    Enum.find(process_managers, fn
+      %ProcessManager{name: ^name} -> true
+      %ProcessManager{} -> false
+    end)
+  end
+
+  def find_projection(%Model{} = model, name) do
+    %Model{projections: projections} = model
+
+    Enum.find(projections, fn
+      %Projection{name: ^name} -> true
+      %Projection{} -> false
     end)
   end
 end
