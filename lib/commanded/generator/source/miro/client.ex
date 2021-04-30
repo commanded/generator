@@ -1,6 +1,6 @@
 defmodule Commanded.Generator.Source.Miro.Client do
   def new(opts \\ []) do
-    access_token = Keyword.get(opts, :access_token) || System.fetch_env!("MIRO_ACCESS_TOKEN")
+    access_token = Keyword.get(opts, :access_token) || System.get_env("MIRO_ACCESS_TOKEN")
 
     middleware = [
       {Tesla.Middleware.BaseUrl, "https://api.miro.com/v1"},
