@@ -252,6 +252,66 @@ defmodule Commanded.Generator.Source.MiroTest do
                model
              )
     end
+
+    test "with duplicates" do
+      mock_request("boards/widgets/list_all_with_duplicates.json")
+
+      {:ok, model} = Miro.build(namespace: MyApp, board_id: "o9J_lJibPCc=")
+
+      assert match?(
+               %Model{
+                 namespace: MyApp,
+                 aggregates: [
+                   %Aggregate{
+                     name: "Aggregate",
+                     module: MyApp.Aggregate,
+                     commands: [
+                       %Command{name: "Command A", module: MyApp.Aggregate.Commands.CommandA},
+                       %Command{name: "Command B", module: MyApp.Aggregate.Commands.CommandB},
+                       %Command{name: "Command C", module: MyApp.Aggregate.Commands.CommandC}
+                     ],
+                     events: [
+                       %Event{name: "Event A", module: MyApp.Aggregate.Events.EventA},
+                       %Event{name: "Event B", module: MyApp.Aggregate.Events.EventB},
+                       %Event{name: "Event C", module: MyApp.Aggregate.Events.EventC}
+                     ]
+                   }
+                 ],
+                 event_handlers: [
+                   %EventHandler{
+                     name: "Event Handler",
+                     module: MyApp.Handlers.EventHandler,
+                     events: [
+                       %Event{name: "Event A", module: MyApp.Aggregate.Events.EventA},
+                       %Event{name: "Event B", module: MyApp.Aggregate.Events.EventB}
+                     ]
+                   }
+                 ],
+                 process_managers: [
+                   %ProcessManager{
+                     name: "Process Manager",
+                     module: MyApp.Processes.ProcessManager,
+                     events: [
+                       %Event{name: "Event A", module: MyApp.Aggregate.Events.EventA},
+                       %Event{name: "Event B", module: MyApp.Aggregate.Events.EventB}
+                     ]
+                   }
+                 ],
+                 projections: [
+                   %Projection{
+                     name: "Projection",
+                     module: MyApp.Projections.Projection,
+                     fields: [],
+                     events: [
+                       %Event{name: "Event A", module: MyApp.Aggregate.Events.EventA},
+                       %Event{name: "Event B", module: MyApp.Aggregate.Events.EventB}
+                     ]
+                   }
+                 ]
+               },
+               model
+             )
+    end
   end
 
   defp mock_request(path) do
