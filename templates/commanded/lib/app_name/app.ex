@@ -7,4 +7,6 @@ defmodule <%= @app_module %>.App do
       adapter: Commanded.EventStore.Adapters.EventStore,
       event_store: <%= @app_module %>.EventStore
     ]
+
+  router(<%= @app_module %>.Router)
 end
