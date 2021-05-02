@@ -25,6 +25,10 @@ defmodule Mix.Tasks.Commanded.New do
 
     * `-v`, `--version` - prints the Commanded installer version
 
+  ## Sources
+
+    * `--miro` - the Miro board id used to scaffold the Commanded application
+
   ## Installation
 
   `mix commanded.new` by default prompts you to fetch and install your
@@ -48,7 +52,8 @@ defmodule Mix.Tasks.Commanded.New do
   use Mix.Task
 
   alias Commanded.Generator
-  alias Commanded.Generator.{Project, Single}
+  alias Commanded.Generator.{Project, New}
+  alias Commanded.Generator.Source.Miro
 
   @version Mix.Project.config()[:version]
   @shortdoc "Creates a new Commanded v#{@version} application"
@@ -58,6 +63,7 @@ defmodule Mix.Tasks.Commanded.New do
     binary_id: :boolean,
     dev: :boolean,
     install: :boolean,
+    miro: :string,
     module: :string,
     prefix: :string,
     projections: :boolean,
@@ -77,7 +83,7 @@ defmodule Mix.Tasks.Commanded.New do
         Mix.Tasks.Help.run(["commanded.new"])
 
       {opts, [base_path | _]} ->
-        generate(base_path, Single, :project_path, opts)
+        generate(base_path, New, :project_path, opts)
     end
   end
 
@@ -94,6 +100,7 @@ defmodule Mix.Tasks.Commanded.New do
   defp generate(base_path, generator, path, opts) do
     base_path
     |> Project.new(opts)
+    |> build_model()
     |> generator.prepare_project()
     |> Generator.put_binding()
     |> validate_project(path)
@@ -108,6 +115,18 @@ defmodule Mix.Tasks.Commanded.New do
     check_module_name_availability!(project.root_mod)
 
     project
+  end
+
+  defp build_model(%Project{} = project) do
+    %Project{app_mod: app_mod, opts: opts} = project
+
+    case Keyword.get(opts, :miro) do
+      board_id when is_binary(board_id) ->
+        Project.build_model(project, Miro, namespace: app_mod, board_id: board_id)
+
+      nil ->
+        project
+    end
   end
 
   defp prompt_to_install_deps(%Project{} = project, generator, path_key) do

@@ -63,7 +63,7 @@ defmodule Commanded.Generator do
     mapping = mod.template_files(name)
 
     for {format, source, project_location, target_path} <- mapping do
-      target = Project.join_path(project, project_location, target_path)
+      target = Project.join_path(project, project_location, target_path) |> IO.inspect()
 
       case format do
         :keep ->

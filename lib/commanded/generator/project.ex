@@ -11,7 +11,8 @@ defmodule Commanded.Generator.Project do
             project_path: nil,
             opts: :unset,
             binding: [],
-            generators: []
+            generators: [],
+            model: nil
 
   def new(project_path, opts) do
     project_path = Path.expand(project_path)
@@ -28,12 +29,20 @@ defmodule Commanded.Generator.Project do
     }
   end
 
-  def ecto?(%Project{binding: binding}) do
-    Keyword.fetch!(binding, :ecto)
-  end
-
   def verbose?(%Project{opts: opts}) do
     Keyword.get(opts, :verbose, false)
+  end
+
+  def merge_binding(%Project{} = project, new_binding) do
+    %Project{binding: binding} = project
+
+    %Project{project | binding: Keyword.merge(binding, new_binding)}
+  end
+
+  def build_model(%Project{} = project, source, args) do
+    {:ok, model} = source.build(args)
+
+    %Project{project | model: model}
   end
 
   def join_path(%Project{} = project, location, path) when location in [:project, :app] do
@@ -43,9 +52,22 @@ defmodule Commanded.Generator.Project do
     |> expand_path_with_bindings(project)
   end
 
+  def join_path(%Project{} = project, location, path) do
+    %Project{binding: binding} = project
+
+    binding
+    |> Keyword.fetch!(:"#{location}_path")
+    |> Path.join(path)
+    |> expand_path_with_bindings(project)
+  end
+
   defp expand_path_with_bindings(path, %Project{} = project) do
+    %Project{binding: binding} = project
+
     Regex.replace(Regex.recompile!(~r/:[a-zA-Z0-9_]+/), path, fn ":" <> key, _ ->
-      project |> Map.fetch!(:"#{key}") |> to_string()
+      value = Map.get(project, :"#{key}") || Keyword.get(binding, :"#{key}")
+
+      to_string(value)
     end)
   end
 end

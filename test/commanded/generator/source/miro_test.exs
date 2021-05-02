@@ -312,6 +312,67 @@ defmodule Commanded.Generator.Source.MiroTest do
                model
              )
     end
+
+    test "conference domain example" do
+      mock_request("boards/widgets/list_all_conference_example.json")
+
+      {:ok, %Model{aggregates: aggregates}} =
+        Miro.build(namespace: MyApp, board_id: "o9J_lJibPCc=")
+
+      assert match?(
+               %Aggregate{
+                 name: "Conference",
+                 module: MyApp.Conference,
+                 commands: [
+                   %Command{
+                     name: "Create Conference",
+                     module: MyApp.Conference.Commands.CreateConference
+                   },
+                   %Command{
+                     name: "Create Seat",
+                     module: MyApp.Conference.Commands.CreateSeat
+                   },
+                   %Command{
+                     name: "Delete Seat",
+                     module: MyApp.Conference.Commands.DeleteSeat
+                   },
+                   %Command{
+                     name: "Publish Conference",
+                     module: MyApp.Conference.Commands.PublishConference
+                   },
+                   %Command{
+                     name: "Unpublish Conference",
+                     module: MyApp.Conference.Commands.UnpublishConference
+                   },
+                   %Command{
+                     name: "Update Conference",
+                     module: MyApp.Conference.Commands.UpdateConference
+                   }
+                 ],
+                 events: [
+                   %Event{
+                     name: "Conference Created",
+                     module: MyApp.Conference.Events.ConferenceCreated
+                   },
+                   %Event{
+                     name: "Conference Published",
+                     module: MyApp.Conference.Events.ConferencePublished
+                   },
+                   %Event{
+                     name: "Conference Unpublished",
+                     module: MyApp.Conference.Events.ConferenceUnpublished
+                   },
+                   %Event{
+                     name: "Conference Updated",
+                     module: MyApp.Conference.Events.ConferenceUpdated
+                   },
+                   %Event{name: "Seat Created", module: MyApp.Conference.Events.SeatCreated},
+                   %Event{name: "Seat Deleted", module: MyApp.Conference.Events.SeatDeleted}
+                 ]
+               },
+               Enum.at(aggregates, 0)
+             )
+    end
   end
 
   defp mock_request(path) do
