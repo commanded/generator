@@ -46,6 +46,7 @@ defmodule Commanded.Generator.New do
 
   def generate(%Project{} = project) do
     copy_from(project, __MODULE__, :new)
+
     generate_model(project)
   end
 

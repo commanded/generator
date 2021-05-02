@@ -93,8 +93,8 @@ defmodule Mix.Tasks.Commanded.NewTest do
       assert_file("my_app/lib/my_app/order/order.ex", fn file ->
         assert file =~ "defmodule MyApp.Order do"
         assert file =~ "Order aggregate"
-        assert file =~ "alias MyApp.Order.Commands.RegisterToConference"
-        assert file =~ "alias MyApp.Order.Events.OrderPlaced"
+        assert file =~ "alias MyApp.Order.Commands.{AssignRegistrant"
+        assert file =~ "alias MyApp.Order.Events.{OrderConfirmed"
         assert file =~ "def apply(%Order{} = order, %OrderPlaced{} = event) do"
       end)
 

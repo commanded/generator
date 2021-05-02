@@ -63,7 +63,7 @@ defmodule Commanded.Generator do
     mapping = mod.template_files(name)
 
     for {format, source, project_location, target_path} <- mapping do
-      target = Project.join_path(project, project_location, target_path) |> IO.inspect()
+      target = Project.join_path(project, project_location, target_path)
 
       case format do
         :keep ->
@@ -161,10 +161,19 @@ defmodule Commanded.Generator do
       commanded_dep: commanded_dep(commanded_path, version),
       commanded_path: commanded_path,
       generators: nil_if_empty(project.generators),
-      namespaced?: namespaced?(project)
+      namespaced?: namespaced?(project),
+      format_aliases: &format_aliases/1
     ]
 
     %Project{project | binding: binding}
+  end
+
+  defp format_aliases(aliases) do
+    for {namespace, aliases} <- Enum.group_by(aliases, & &1.namespace) do
+      aliases = Enum.map(aliases, & &1.module) |> Enum.join(", ")
+
+      "alias " <> namespace <> ".{" <> aliases <> "}"
+    end
   end
 
   defp elixir_version do
