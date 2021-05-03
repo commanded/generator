@@ -4606,6 +4606,100 @@
       "name" : "Ben Smith",
       "id" : "3074457346439865295"
     }
+  }, {
+    "id" : "3074457358221593180",
+    "style" : {
+      "padding" : null,
+      "backgroundOpacity" : null,
+      "backgroundColor" : "#ea94bb",
+      "borderColor" : null,
+      "borderStyle" : null,
+      "borderOpacity" : null,
+      "borderWidth" : null,
+      "fontSize" : 30,
+      "fontFamily" : "OpenSans",
+      "textColor" : null,
+      "textAlign" : "center",
+      "textAlignVertical" : "middle",
+      "shapeType" : null
+    },
+    "text" : "<p>Third Party Payment Handler</p>",
+    "x" : 2698.46811624542,
+    "y" : -1676.02471422581,
+    "width" : 199.0,
+    "height" : 228.0,
+    "scale" : 0.54,
+    "type" : "sticker",
+    "createdAt" : "2021-05-03T21:03:42Z",
+    "modifiedAt" : "2021-05-03T21:05:34Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358221682842",
+    "startWidget" : {
+      "id" : "3074457358125091271"
+    },
+    "endWidget" : {
+      "id" : "3074457358221593180"
+    },
+    "style" : {
+      "borderColor" : "#000000",
+      "borderStyle" : "normal",
+      "borderWidth" : 1.0,
+      "lineEndType" : "opaque_block",
+      "lineStartType" : "none",
+      "lineType" : "bezier"
+    },
+    "type" : "line",
+    "createdAt" : "2021-05-03T21:05:32Z",
+    "modifiedAt" : "2021-05-03T21:05:32Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
+  }, {
+    "id" : "3074457358221682875",
+    "startWidget" : {
+      "id" : "3074457358221593180"
+    },
+    "endWidget" : {
+      "id" : "3074457358161677323"
+    },
+    "style" : {
+      "borderColor" : "#000000",
+      "borderStyle" : "normal",
+      "borderWidth" : 1.0,
+      "lineEndType" : "opaque_block",
+      "lineStartType" : "none",
+      "lineType" : "bezier"
+    },
+    "type" : "line",
+    "createdAt" : "2021-05-03T21:05:36Z",
+    "modifiedAt" : "2021-05-03T21:05:36Z",
+    "modifiedBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    },
+    "createdBy" : {
+      "type" : "user",
+      "name" : "Ben Smith",
+      "id" : "3074457346439865295"
+    }
   } ],
-  "size" : 140
+  "size" : 143
 }

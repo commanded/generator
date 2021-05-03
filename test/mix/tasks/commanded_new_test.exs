@@ -88,6 +88,7 @@ defmodule Mix.Tasks.Commanded.NewTest do
         assert file =~ "defmodule MyApp.Conference do"
         assert file =~ "Conference aggregate"
         assert file =~ "def execute(%Conference{} = conference, %CreateConference{} = command) do"
+        assert file =~ "def apply(%Conference{} = conference, %ConferenceCreated{} = event) do"
       end)
 
       assert_file("my_app/lib/my_app/order/order.ex", fn file ->
@@ -96,6 +97,18 @@ defmodule Mix.Tasks.Commanded.NewTest do
         assert file =~ "alias MyApp.Order.Commands.{AssignRegistrant"
         assert file =~ "alias MyApp.Order.Events.{OrderConfirmed"
         assert file =~ "def apply(%Order{} = order, %OrderPlaced{} = event) do"
+      end)
+
+      # TODO: Commands
+      # TODO: Events
+
+      # Event handlers
+      assert_file("my_app/lib/my_app/handlers/third_party_payment_handler.ex", fn file ->
+        assert file =~ "defmodule MyApp.Handlers.ThirdPartyPaymentHandler do"
+        assert file =~ "@moduledoc \"\"\"\n  Third Party Payment Handler event handler."
+        assert file =~ "alias MyApp.Order.Events.{OrderReservationCompleted"
+        assert file =~ "def handle(%OrderReservationCompleted{} = event, _metadata) do"
+        assert file =~ "def error(_error, _failed_event, _failure_context) do"
       end)
 
       # Install dependencies?

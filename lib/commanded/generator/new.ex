@@ -3,7 +3,7 @@ defmodule Commanded.Generator.New do
   use Commanded.Generator
 
   alias Commanded.Generator.{Model, Project}
-  alias Commanded.Generator.Model.{Aggregate, Command, Event}
+  alias Commanded.Generator.Model.{Aggregate, Command, Event, EventHandler}
 
   template(:new, [
     {:eex, "commanded/config/config.exs", :project, "config/config.exs"},
@@ -24,6 +24,18 @@ defmodule Commanded.Generator.New do
 
   template(:aggregate, [
     {:eex, "aggregate/aggregate.ex", :project, "lib/:app/:aggregate/:aggregate.ex"}
+  ])
+
+  template(:command, [
+    {:eex, "aggregate/commands/command.ex", :project, "lib/:command_path/:command.ex"}
+  ])
+
+  template(:event, [
+    {:eex, "aggregate/events/event.ex", :project, "lib/:event_path/:event.ex"}
+  ])
+
+  template(:event_handler, [
+    {:eex, "event_handler/event_handler.ex", :project, "lib/:app/handlers/:event_handler.ex"}
   ])
 
   def prepare_project(%Project{app: app} = project) when not is_nil(app) do
@@ -53,7 +65,15 @@ defmodule Commanded.Generator.New do
   defp generate_model(%Project{model: nil} = project), do: project
 
   defp generate_model(%Project{} = project) do
-    %Project{model: %Model{aggregates: aggregates}} = project
+    %Project{
+      model: %Model{
+        aggregates: aggregates,
+        # events: events,
+        event_handlers: event_handlers
+        # process_managers: process_managers,
+        # projections: projections
+      }
+    } = project
 
     for aggregate <- aggregates do
       %Aggregate{commands: commands, events: events, module: module, name: name, fields: fields} =
@@ -88,7 +108,96 @@ defmodule Commanded.Generator.New do
         )
 
       copy_from(project, __MODULE__, :aggregate)
+
+      for command <- commands do
+        %Command{name: name, module: module, fields: fields} = command
+
+        {namespace, module} = module_parts(module)
+
+        project =
+          Project.merge_binding(project,
+            command: Macro.underscore(module),
+            command_name: name,
+            command_module: module,
+            command_namespace: namespace,
+            command_path: Macro.underscore(namespace),
+            fields: fields
+          )
+
+        copy_from(project, __MODULE__, :command)
+      end
+
+      for event <- events do
+        %Event{name: name, module: module, fields: fields} = event
+
+        {namespace, module} = module_parts(module)
+
+        project =
+          Project.merge_binding(project,
+            event: Macro.underscore(module),
+            event_name: name,
+            event_module: module,
+            event_namespace: namespace,
+            event_path: Macro.underscore(namespace),
+            fields: fields
+          )
+
+        copy_from(project, __MODULE__, :event)
+      end
     end
+
+    for event_handler <- event_handlers do
+      %EventHandler{events: events, module: module, name: name} = event_handler
+
+      {namespace, module} = module_parts(module)
+
+      project =
+        Project.merge_binding(project,
+          event_handler: Macro.underscore(module),
+          event_handler_name: name,
+          event_handler_namespace: namespace,
+          event_handler_module: module,
+          events:
+            Enum.map(events, fn %Event{} = event ->
+              %Event{name: name, module: module, fields: fields} = event
+
+              {namespace, module} = module_parts(module)
+
+              %{name: name, module: module, namespace: namespace, fields: fields}
+            end)
+        )
+
+      copy_from(project, __MODULE__, :event_handler)
+    end
+
+    # events =
+    #   [aggregates, event_handlers, process_managers, projections]
+    #   |> Enum.flat_map(& &1)
+    #   |> Enum.flat_map(& &1.events)
+    #   |> Enum.concat(events)
+    #   |> Enum.uniq()
+    #
+    # for event <- events do
+    #   %Event{name: name, module: module, fields: fields} = event
+    #
+    #   {namespace, module} = module_parts(module)
+    #
+    #   project =
+    #     Project.merge_binding(project,
+    #       event: Macro.underscore(module),
+    #       event_name: name,
+    #       event_module: module,
+    #       event_namespace: namespace,
+    #       event_path: Macro.underscore(namespace),
+    #       fields: fields
+    #     )
+    #
+    #   copy_from(project, __MODULE__, :event)
+    # end
+
+    # TODO: command routing
+    # TODO: process managers
+    # TODO: projections
 
     project
   end

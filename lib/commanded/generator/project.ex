@@ -52,15 +52,6 @@ defmodule Commanded.Generator.Project do
     |> expand_path_with_bindings(project)
   end
 
-  def join_path(%Project{} = project, location, path) do
-    %Project{binding: binding} = project
-
-    binding
-    |> Keyword.fetch!(:"#{location}_path")
-    |> Path.join(path)
-    |> expand_path_with_bindings(project)
-  end
-
   defp expand_path_with_bindings(path, %Project{} = project) do
     %Project{binding: binding} = project
 
