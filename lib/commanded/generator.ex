@@ -169,11 +169,14 @@ defmodule Commanded.Generator do
   end
 
   defp format_aliases(aliases) do
-    for {namespace, aliases} <- Enum.group_by(aliases, & &1.namespace) do
+    aliases
+    |> Enum.group_by(& &1.namespace)
+    |> Enum.map(fn {namespace, aliases} ->
       aliases = Enum.map(aliases, & &1.module) |> Enum.join(", ")
 
       "alias " <> namespace <> ".{" <> aliases <> "}"
-    end
+    end)
+    |> Enum.join("\n  ")
   end
 
   defp elixir_version do

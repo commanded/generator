@@ -87,8 +87,20 @@ defmodule Mix.Tasks.Commanded.NewTest do
       assert_file("my_app/lib/my_app/conference/conference.ex", fn file ->
         assert file =~ "defmodule MyApp.Conference do"
         assert file =~ "Conference aggregate"
-        assert file =~ "def execute(%Conference{} = conference, %CreateConference{} = command) do"
-        assert file =~ "def apply(%Conference{} = conference, %ConferenceCreated{} = event) do"
+
+        assert file =~
+                 """
+                   def execute(%Conference{}, %CreateConference{}) do
+                     :ok
+                   end
+                 """
+
+        assert file =~
+                 """
+                   def apply(%Conference{} = state, %ConferenceCreated{}) do
+                     state
+                   end
+                 """
       end)
 
       assert_file("my_app/lib/my_app/order/order.ex", fn file ->
@@ -96,19 +108,173 @@ defmodule Mix.Tasks.Commanded.NewTest do
         assert file =~ "Order aggregate"
         assert file =~ "alias MyApp.Order.Commands.{AssignRegistrant"
         assert file =~ "alias MyApp.Order.Events.{OrderConfirmed"
-        assert file =~ "def apply(%Order{} = order, %OrderPlaced{} = event) do"
+
+        assert file =~
+                 """
+                   def execute(%Order{}, %AssignRegistrant{}) do
+                     :ok
+                   end
+                 """
+
+        assert file =~
+                 """
+                   def apply(%Order{} = state, %OrderPlaced{}) do
+                     state
+                   end
+                 """
       end)
 
-      # TODO: Commands
-      # TODO: Events
+      # Commands
+      assert_file("my_app/lib/my_app/conference/commands/create_conference.ex", fn file ->
+        assert file =~ "defmodule MyApp.Conference.Commands.CreateConference do"
+
+        assert file =~
+                 """
+                   @type t :: %CreateConference{
+                     conference_id: String.t()
+                   }
+                 """
+
+        assert file =~
+                 """
+                   defstruct [
+                     :conference_id
+                   ]
+                 """
+      end)
+
+      # Events
+      assert_file("my_app/lib/my_app/conference/events/conference_created.ex", fn file ->
+        assert file =~ "defmodule MyApp.Conference.Events.ConferenceCreated do"
+
+        assert file =~
+                 """
+                   @type t :: %ConferenceCreated{
+                     conference_id: String.t()
+                   }
+                 """
+
+        assert file =~
+                 """
+                   @derive Jason.Encoder
+                   defstruct [
+                     :conference_id
+                   ]
+                 """
+      end)
 
       # Event handlers
       assert_file("my_app/lib/my_app/handlers/third_party_payment_handler.ex", fn file ->
         assert file =~ "defmodule MyApp.Handlers.ThirdPartyPaymentHandler do"
-        assert file =~ "@moduledoc \"\"\"\n  Third Party Payment Handler event handler."
+        assert file =~ "@moduledoc \"\"\"\n  Third Party Payment Handler."
+
+        assert file =~
+                 """
+                   use Commanded.Event.Handler,
+                     application: MyApp.App,
+                     name: __MODULE__,
+                     start_from: :origin
+                 """
+
         assert file =~ "alias MyApp.Order.Events.{OrderReservationCompleted"
-        assert file =~ "def handle(%OrderReservationCompleted{} = event, _metadata) do"
-        assert file =~ "def error(_error, _failed_event, _failure_context) do"
+
+        assert file =~
+                 """
+                   @impl Commanded.Event.Handler
+                   def handle(%OrderReservationCompleted{}, _metadata) do
+                     :ok
+                   end
+                 """
+
+        assert file =~
+                 """
+                   @impl Commanded.Event.Handler
+                   def error(_error, _failed_event, _failure_context) do
+                     :skip
+                   end
+                 """
+      end)
+
+      # Process managers
+      assert_file("my_app/lib/my_app/processes/registration_process_manager.ex", fn file ->
+        assert file =~ "defmodule MyApp.Processes.RegistrationProcessManager do"
+        assert file =~ "@moduledoc \"\"\"\n  Registration Process Manager."
+        assert file =~ "alias MyApp.Order.Events.{OrderConfirmed"
+
+        assert file =~
+                 """
+                   use Commanded.ProcessManagers.ProcessManager,
+                     application: MyApp.App,
+                     name: __MODULE__,
+                     start_from: :origin
+                 """
+
+        assert file =~ "def interested?(%OrderConfirmed{}) do"
+
+        assert file =~
+                 """
+                   @impl Commanded.ProcessManagers.ProcessManager
+                   def handle(%RegistrationProcessManager{}, %OrderConfirmed{}) do
+                     []
+                   end
+                 """
+
+        assert file =~
+                 """
+                   @impl Commanded.ProcessManagers.ProcessManager
+                   def apply(%RegistrationProcessManager{} = state, %OrderConfirmed{}) do
+                     state
+                   end
+                 """
+
+        assert file =~
+                 """
+                   @impl Commanded.ProcessManagers.ProcessManager
+                   def error(_error, _failure_source, _failure_context) do
+                     :skip
+                   end
+                 """
+      end)
+
+      # Commanded Router module
+      assert_file("my_app/lib/my_app/router.ex", fn file ->
+        assert file =~ "defmodule MyApp.Router do"
+        assert file =~ "use Commanded.Commands.Router"
+        assert file =~ "alias MyApp.Conference"
+        assert file =~ "alias MyApp.Order"
+        assert file =~ "alias MyApp.SeatsAvailability"
+
+        assert file =~
+                 "alias MyApp.Conference.Commands.{CreateConference, CreateSeat, DeleteSeat, PublishConference, UnpublishConference, UpdateConference}"
+
+        assert file =~
+                 """
+                   identify(Conference, by: :conference_id, prefix: "conference-")
+                 """
+
+        assert file =~
+                 """
+                   identify(Order, by: :order_id, prefix: "order-")
+                 """
+
+        assert file =~
+                 """
+                   identify(SeatsAvailability, by: :seats_availability_id, prefix: "seats-availability-")
+                 """
+
+        assert file =~
+                 """
+                   dispatch([CreateConference, CreateSeat, DeleteSeat, PublishConference, UnpublishConference, UpdateConference], to: Conference)
+                 """
+      end)
+
+      # Elixir Application module
+      assert_file("my_app/lib/my_app/application.ex", fn file ->
+        assert file =~
+                 "{MyApp.Handlers.ThirdPartyPaymentHandler, hibernate_after: :timer.seconds(15)},"
+
+        assert file =~
+                 "{MyApp.Processes.RegistrationProcessManager, hibernate_after: :timer.seconds(15)},"
       end)
 
       # Install dependencies?
@@ -153,7 +319,17 @@ defmodule Mix.Tasks.Commanded.NewTest do
     # Commanded Application module
     assert_file("my_app/lib/my_app/app.ex", fn file ->
       assert file =~ "defmodule MyApp.App do"
-      assert file =~ "use Commanded.Application,\n    otp_app: :my_app"
+
+      assert file =~
+               """
+                 use Commanded.Application,
+                   otp_app: :my_app,
+                   event_store: [
+                     adapter: Commanded.EventStore.Adapters.EventStore,
+                     event_store: MyApp.EventStore
+                   ]
+               """
+
       assert file =~ "router(MyApp.Router)"
     end)
 

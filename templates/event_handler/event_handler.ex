@@ -1,6 +1,6 @@
 defmodule <%= @event_handler_namespace %>.<%= @event_handler_module %> do
   @moduledoc """
-  <%= @event_handler_name %> event handler.
+  <%= @event_handler_name %>.
   """
 
   use Commanded.Event.Handler,
@@ -9,15 +9,10 @@ defmodule <%= @event_handler_namespace %>.<%= @event_handler_module %> do
     start_from: :origin
 
   <%= @format_aliases.(@events) %>
-  alias __MODULE__
 
   <%= for event <- @events do %>
   @impl Commanded.Event.Handler
-  def handle(%<%= event.module %>{} = event, _metadata) do
-    %<%= event.module %>{} = event
-
-    # TODO: Handle <%= event.name %>
-
+  def handle(%<%= event.module %>{}, _metadata) do
     :ok
   end
   <% end %>

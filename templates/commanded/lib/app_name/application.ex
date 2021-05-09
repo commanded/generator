@@ -11,8 +11,17 @@ defmodule <%= @app_module %>.Application do
       # Start the Commanded application
       <%= @app_module %>.App,
 
-      # Start a worker by calling: <%= @app_module %>.Worker.start_link(arg)
-      # {<%= @app_module %>.Worker, arg}
+      <%= if Enum.any?(@event_handlers) do %>
+      # Start event handlers
+      <%= for event_handler <- @event_handlers do %>
+      {<%= event_handler.event_handler_namespace %>.<%= event_handler.event_handler_module %>, hibernate_after: :timer.seconds(15)},
+      <% end %><% end %>
+
+      <%= if Enum.any?(@process_managers) do %>
+      # Start process managers
+      <%= for process_manager <- @process_managers do %>
+      {<%= process_manager.process_manager_namespace %>.<%= process_manager.process_manager_module %>, hibernate_after: :timer.seconds(15)},
+      <% end %><% end %>
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

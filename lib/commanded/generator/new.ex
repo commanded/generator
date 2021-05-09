@@ -3,7 +3,7 @@ defmodule Commanded.Generator.New do
   use Commanded.Generator
 
   alias Commanded.Generator.{Model, Project}
-  alias Commanded.Generator.Model.{Aggregate, Command, Event, EventHandler}
+  alias Commanded.Generator.Model.{Aggregate, Command, Event, EventHandler, ProcessManager}
 
   template(:new, [
     {:eex, "commanded/config/config.exs", :project, "config/config.exs"},
@@ -38,6 +38,11 @@ defmodule Commanded.Generator.New do
     {:eex, "event_handler/event_handler.ex", :project, "lib/:app/handlers/:event_handler.ex"}
   ])
 
+  template(:process_manager, [
+    {:eex, "process_manager/process_manager.ex", :project,
+     "lib/:app/processes/:process_manager.ex"}
+  ])
+
   def prepare_project(%Project{app: app} = project) when not is_nil(app) do
     %Project{project | project_path: project.base_path}
     |> put_app()
@@ -57,6 +62,8 @@ defmodule Commanded.Generator.New do
   end
 
   def generate(%Project{} = project) do
+    project = new_project_binding(project)
+
     copy_from(project, __MODULE__, :new)
 
     generate_model(project)
@@ -68,138 +75,171 @@ defmodule Commanded.Generator.New do
     %Project{
       model: %Model{
         aggregates: aggregates,
-        # events: events,
-        event_handlers: event_handlers
-        # process_managers: process_managers,
+        event_handlers: event_handlers,
+        process_managers: process_managers
         # projections: projections
       }
     } = project
 
     for aggregate <- aggregates do
-      %Aggregate{commands: commands, events: events, module: module, name: name, fields: fields} =
-        aggregate
+      %Aggregate{commands: commands, events: events} = aggregate
 
-      {namespace, module} = module_parts(module)
-
-      project =
-        Project.merge_binding(project,
-          aggregate: Macro.underscore(module),
-          aggregate_name: name,
-          aggregate_namespace: namespace,
-          aggregate_module: module,
-          aggregate_path: Macro.underscore(namespace <> "." <> module),
-          commands:
-            Enum.map(commands, fn %Command{} = command ->
-              %Command{name: name, module: module, fields: fields} = command
-
-              {namespace, module} = module_parts(module)
-
-              %{name: name, module: module, namespace: namespace, fields: fields}
-            end),
-          events:
-            Enum.map(events, fn %Event{} = event ->
-              %Event{name: name, module: module, fields: fields} = event
-
-              {namespace, module} = module_parts(module)
-
-              %{name: name, module: module, namespace: namespace, fields: fields}
-            end),
-          fields: fields
-        )
+      project = Project.merge_binding(project, aggregate_binding(aggregate))
 
       copy_from(project, __MODULE__, :aggregate)
 
       for command <- commands do
-        %Command{name: name, module: module, fields: fields} = command
-
-        {namespace, module} = module_parts(module)
-
-        project =
-          Project.merge_binding(project,
-            command: Macro.underscore(module),
-            command_name: name,
-            command_module: module,
-            command_namespace: namespace,
-            command_path: Macro.underscore(namespace),
-            fields: fields
-          )
+        project = Project.merge_binding(project, command_binding(command))
 
         copy_from(project, __MODULE__, :command)
       end
 
       for event <- events do
-        %Event{name: name, module: module, fields: fields} = event
-
-        {namespace, module} = module_parts(module)
-
-        project =
-          Project.merge_binding(project,
-            event: Macro.underscore(module),
-            event_name: name,
-            event_module: module,
-            event_namespace: namespace,
-            event_path: Macro.underscore(namespace),
-            fields: fields
-          )
+        project = Project.merge_binding(project, event_binding(event))
 
         copy_from(project, __MODULE__, :event)
       end
     end
 
     for event_handler <- event_handlers do
-      %EventHandler{events: events, module: module, name: name} = event_handler
-
-      {namespace, module} = module_parts(module)
-
-      project =
-        Project.merge_binding(project,
-          event_handler: Macro.underscore(module),
-          event_handler_name: name,
-          event_handler_namespace: namespace,
-          event_handler_module: module,
-          events:
-            Enum.map(events, fn %Event{} = event ->
-              %Event{name: name, module: module, fields: fields} = event
-
-              {namespace, module} = module_parts(module)
-
-              %{name: name, module: module, namespace: namespace, fields: fields}
-            end)
-        )
+      project = Project.merge_binding(project, event_handler_binding(event_handler))
 
       copy_from(project, __MODULE__, :event_handler)
     end
 
-    # events =
-    #   [aggregates, event_handlers, process_managers, projections]
-    #   |> Enum.flat_map(& &1)
-    #   |> Enum.flat_map(& &1.events)
-    #   |> Enum.concat(events)
-    #   |> Enum.uniq()
-    #
-    # for event <- events do
-    #   %Event{name: name, module: module, fields: fields} = event
-    #
-    #   {namespace, module} = module_parts(module)
-    #
-    #   project =
-    #     Project.merge_binding(project,
-    #       event: Macro.underscore(module),
-    #       event_name: name,
-    #       event_module: module,
-    #       event_namespace: namespace,
-    #       event_path: Macro.underscore(namespace),
-    #       fields: fields
-    #     )
-    #
-    #   copy_from(project, __MODULE__, :event)
-    # end
+    for process_manager <- process_managers do
+      project = Project.merge_binding(project, process_manager_binding(process_manager))
 
-    # TODO: command routing
-    # TODO: process managers
-    # TODO: projections
+      copy_from(project, __MODULE__, :process_manager)
+    end
 
     project
+  end
+
+  defp new_project_binding(%Project{model: nil} = project) do
+    Project.merge_binding(project, aggregates: [], event_handlers: [], process_managers: [])
+  end
+
+  defp new_project_binding(%Project{} = project) do
+    %Project{
+      model: %Model{
+        aggregates: aggregates,
+        event_handlers: event_handlers,
+        process_managers: process_managers
+      }
+    } = project
+
+    Project.merge_binding(project,
+      aggregates: Enum.map(aggregates, &Enum.into(aggregate_binding(&1), %{})),
+      event_handlers: Enum.map(event_handlers, &Enum.into(event_handler_binding(&1), %{})),
+      process_managers: Enum.map(process_managers, &Enum.into(process_manager_binding(&1), %{}))
+    )
+  end
+
+  defp aggregate_binding(%Aggregate{} = aggregate) do
+    %Aggregate{commands: commands, events: events, module: module, name: name, fields: fields} =
+      aggregate
+
+    {namespace, module} = module_parts(module)
+
+    [
+      aggregate: Macro.underscore(module),
+      aggregate_name: name,
+      aggregate_id: ":#{Macro.underscore(module)}_id",
+      aggregate_namespace: namespace,
+      aggregate_module: module,
+      aggregate_prefix: Macro.underscore(module) |> String.replace("_", "-"),
+      aggregate_path: Macro.underscore(namespace <> "." <> module),
+      commands:
+        Enum.map(commands, fn %Command{} = command ->
+          %Command{name: name, module: module, fields: fields} = command
+
+          {namespace, module} = module_parts(module)
+
+          %{name: name, module: module, namespace: namespace, fields: fields}
+        end),
+      events:
+        Enum.map(events, fn %Event{} = event ->
+          %Event{name: name, module: module, fields: fields} = event
+
+          {namespace, module} = module_parts(module)
+
+          %{name: name, module: module, namespace: namespace, fields: fields}
+        end),
+      fields: fields
+    ]
+  end
+
+  defp command_binding(%Command{} = command) do
+    %Command{name: name, module: module, fields: fields} = command
+
+    {namespace, module} = module_parts(module)
+
+    [
+      command: Macro.underscore(module),
+      command_name: name,
+      command_module: module,
+      command_namespace: namespace,
+      command_path: Macro.underscore(namespace),
+      fields: fields
+    ]
+  end
+
+  defp event_binding(%Event{} = event) do
+    %Event{name: name, module: module, fields: fields} = event
+
+    {namespace, module} = module_parts(module)
+
+    [
+      event: Macro.underscore(module),
+      event_name: name,
+      event_module: module,
+      event_namespace: namespace,
+      event_path: Macro.underscore(namespace),
+      fields: fields
+    ]
+  end
+
+  defp event_handler_binding(%EventHandler{} = event_handler) do
+    %EventHandler{events: events, module: module, name: name} = event_handler
+
+    {namespace, module} = module_parts(module)
+
+    [
+      event_handler: Macro.underscore(module),
+      event_handler_name: name,
+      event_handler_namespace: namespace,
+      event_handler_module: module,
+      events:
+        Enum.map(events, fn %Event{} = event ->
+          %Event{name: name, module: module, fields: fields} = event
+
+          {namespace, module} = module_parts(module)
+
+          %{name: name, module: module, namespace: namespace, fields: fields}
+        end)
+    ]
+  end
+
+  defp process_manager_binding(%ProcessManager{} = process_manager) do
+    %ProcessManager{events: events, module: module, name: name} = process_manager
+
+    {namespace, module} = module_parts(module)
+
+    [
+      process_manager: Macro.underscore(module),
+      process_manager_name: name,
+      process_manager_namespace: namespace,
+      process_manager_module: module,
+      events:
+        Enum.map(events, fn %Event{} = event ->
+          %Event{name: name, module: module, fields: fields} = event
+
+          {namespace, module} = module_parts(module)
+
+          %{name: name, module: module, namespace: namespace, fields: fields}
+        end)
+    ]
   end
 
   defp module_parts(module) do

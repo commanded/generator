@@ -12,7 +12,7 @@ defmodule <%= @aggregate_namespace %>.<%= @aggregate_module %> do
   ]
 
   <%= for command <- @commands do %>
-  def execute(%<%= @aggregate_module %>{} = <%= @aggregate %>, %<%= command.module %>{} = command) do
+  def execute(%<%= @aggregate_module %>{}, %<%= command.module %>{}) do
     :ok
   end
   <% end %>
@@ -20,8 +20,8 @@ defmodule <%= @aggregate_namespace %>.<%= @aggregate_module %> do
   # State mutators
 
   <%= for event <- @events do %>
-  def apply(%<%= @aggregate_module %>{} = <%= @aggregate %>, %<%= event.module %>{} = event) do
-    <%= @aggregate %>
+  def apply(%<%= @aggregate_module %>{} = state, %<%= event.module %>{}) do
+    state
   end
   <% end %>
 end
