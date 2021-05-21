@@ -195,6 +195,105 @@ defmodule Commanded.Generator.Source.MiroTest do
              )
     end
 
+    test "with multiple events produced from a single command" do
+      mock_request("boards/widgets/list_all_multiple_events_from_one_command.json")
+
+      {:ok, model} = Miro.build(namespace: MyApp, board_id: "o9J_lJibPCc=")
+
+      assert match?(
+               %Model{
+                 namespace: MyApp,
+                 aggregates: [
+                   %Aggregate{
+                     name: "Aggregate",
+                     module: MyApp.Aggregate,
+                     commands: [
+                       %Command{
+                         name: "Command A",
+                         module: MyApp.Aggregate.Commands.CommandA
+                       }
+                     ],
+                     events: [
+                       %Event{
+                         name: "Event A",
+                         module: MyApp.Aggregate.Events.EventA
+                       },
+                       %Event{
+                         name: "Event B",
+                         module: MyApp.Aggregate.Events.EventB
+                       },
+                       %Event{
+                         name: "Event C",
+                         module: MyApp.Aggregate.Events.EventC
+                       }
+                     ]
+                   }
+                 ],
+                 event_handlers: [
+                   %EventHandler{
+                     name: "Event Handler",
+                     module: MyApp.Handlers.EventHandler,
+                     events: [
+                       %Event{
+                         name: "Event A",
+                         module: MyApp.Aggregate.Events.EventA
+                       },
+                       %Event{
+                         name: "Event B",
+                         module: MyApp.Aggregate.Events.EventB
+                       },
+                       %Event{
+                         name: "Event C",
+                         module: MyApp.Aggregate.Events.EventC
+                       }
+                     ]
+                   }
+                 ],
+                 process_managers: [
+                   %ProcessManager{
+                     name: "Process Manager",
+                     module: MyApp.Processes.ProcessManager,
+                     events: [
+                       %Event{
+                         name: "Event A",
+                         module: MyApp.Aggregate.Events.EventA
+                       },
+                       %Event{
+                         name: "Event B",
+                         module: MyApp.Aggregate.Events.EventB
+                       },
+                       %Event{
+                         name: "Event C",
+                         module: MyApp.Aggregate.Events.EventC
+                       }
+                     ]
+                   }
+                 ],
+                 projections: [
+                   %Projection{
+                     name: "Projection",
+                     module: MyApp.Projections.Projection,
+                     events: [
+                       %Event{
+                         name: "Event A",
+                         module: MyApp.Aggregate.Events.EventA
+                       },
+                       %Event{
+                         name: "Event B",
+                         module: MyApp.Aggregate.Events.EventB
+                       },
+                       %Event{
+                         name: "Event C",
+                         module: MyApp.Aggregate.Events.EventC
+                       }
+                     ]
+                   }
+                 ]
+               },
+               model
+             )
+    end
+
     test "with circular references" do
       mock_request("boards/widgets/list_all_circular_refs.json")
 

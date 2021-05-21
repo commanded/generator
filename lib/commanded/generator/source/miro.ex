@@ -76,17 +76,7 @@ defmodule Commanded.Generator.Source.Miro do
               Aggregate.add_command(aggregate, command)
 
             is_a?(sticker, :event) ->
-              %{"text" => text} = sticker
-
-              {name, fields} = parse_text(text)
-
-              event =
-                case Model.find_event(model, name) do
-                  %Event{} = event -> event
-                  nil -> Event.new(Module.concat([module, Events]), name, fields)
-                end
-
-              Aggregate.add_event(aggregate, event)
+              include_aggregate_event(model, aggregate, sticker, widgets, [sticker])
 
             true ->
               aggregate
@@ -102,6 +92,35 @@ defmodule Commanded.Generator.Source.Miro do
         end)
 
       %Model{model | aggregates: Enum.sort_by([aggregate | aggregates], & &1.name)}
+    end)
+  end
+
+  defp include_aggregate_event(
+         %Model{} = model,
+         %Aggregate{} = aggregate,
+         sticker,
+         widgets,
+         accumulator
+       ) do
+    %Aggregate{module: module} = aggregate
+    %{"id" => id, "text" => text} = sticker
+
+    {name, fields} = parse_text(text)
+
+    event =
+      case Model.find_event(model, name) do
+        %Event{} = event -> event
+        nil -> Event.new(Module.concat([module, Events]), name, fields)
+      end
+
+    aggregate = Aggregate.add_event(aggregate, event)
+
+    # Inclue any events connected to this event
+    widgets
+    |> connected_to(id, "sticker", &is_a?(&1, :event))
+    |> Enum.reject(&Enum.member?(accumulator, &1))
+    |> Enum.reduce(aggregate, fn sticker, aggregate ->
+      include_aggregate_event(model, aggregate, sticker, widgets, [sticker | accumulator])
     end)
   end
 
