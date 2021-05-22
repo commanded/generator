@@ -70,7 +70,14 @@ defmodule Commanded.Generator do
           File.mkdir_p!(target)
 
         :text ->
-          create_file(target, mod.render(name, source, project.binding))
+          contents = mod.render(name, source, project.binding)
+
+          contents =
+            if Path.extname(target) in [".ex", ".exs"],
+              do: Code.format_string!(contents),
+              else: contents
+
+          create_file(target, contents)
 
         :config ->
           contents = mod.render(name, source, project.binding)
@@ -82,6 +89,12 @@ defmodule Commanded.Generator do
 
         :eex ->
           contents = mod.render(name, source, project.binding)
+
+          contents =
+            if Path.extname(target) in [".ex", ".exs"],
+              do: Code.format_string!(contents),
+              else: contents
+
           create_file(target, contents)
       end
     end

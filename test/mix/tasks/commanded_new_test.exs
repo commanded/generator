@@ -106,8 +106,32 @@ defmodule Mix.Tasks.Commanded.NewTest do
       assert_file("my_app/lib/my_app/order/order.ex", fn file ->
         assert file =~ "defmodule MyApp.Order do"
         assert file =~ "Order aggregate"
-        assert file =~ "alias MyApp.Order.Commands.{AssignRegistrant"
-        assert file =~ "alias MyApp.Order.Events.{OrderConfirmed"
+
+        assert file =~
+                 """
+                   alias MyApp.Order.Commands.{
+                     AssignRegistrant,
+                     ConfirmOrder,
+                     ExpireOrder,
+                     MarkSeatsAsReserved,
+                     RegisterToConference,
+                     RejectOrder,
+                     UpdateSeats
+                   }
+                 """
+
+        assert file =~
+                 """
+                   alias MyApp.Order.Events.{
+                     OrderConfirmed,
+                     OrderExpired,
+                     OrderPlaced,
+                     OrderRegistrantAssigned,
+                     OrderReservationCompleted,
+                     OrderTotalsCalculated,
+                     OrderUpdated
+                   }
+                 """
 
         assert file =~
                  """
@@ -131,8 +155,8 @@ defmodule Mix.Tasks.Commanded.NewTest do
         assert file =~
                  """
                    @type t :: %CreateConference{
-                     conference_id: String.t()
-                   }
+                           conference_id: String.t()
+                         }
                  """
 
         assert file =~
@@ -150,8 +174,8 @@ defmodule Mix.Tasks.Commanded.NewTest do
         assert file =~
                  """
                    @type t :: %ConferenceCreated{
-                     conference_id: String.t()
-                   }
+                           conference_id: String.t()
+                         }
                  """
 
         assert file =~
@@ -245,7 +269,16 @@ defmodule Mix.Tasks.Commanded.NewTest do
         assert file =~ "alias MyApp.SeatsAvailability"
 
         assert file =~
-                 "alias MyApp.Conference.Commands.{CreateConference, CreateSeat, DeleteSeat, PublishConference, UnpublishConference, UpdateConference}"
+                 """
+                   alias MyApp.Conference.Commands.{
+                     CreateConference,
+                     CreateSeat,
+                     DeleteSeat,
+                     PublishConference,
+                     UnpublishConference,
+                     UpdateConference
+                   }
+                 """
 
         assert file =~
                  """
@@ -264,17 +297,27 @@ defmodule Mix.Tasks.Commanded.NewTest do
 
         assert file =~
                  """
-                   dispatch([CreateConference, CreateSeat, DeleteSeat, PublishConference, UnpublishConference, UpdateConference], to: Conference)
+                   dispatch(
+                     [
+                       CreateConference,
+                       CreateSeat,
+                       DeleteSeat,
+                       PublishConference,
+                       UnpublishConference,
+                       UpdateConference
+                     ],
+                     to: Conference
+                   )
                  """
       end)
 
       # Elixir Application module
       assert_file("my_app/lib/my_app/application.ex", fn file ->
         assert file =~
-                 "{MyApp.Handlers.ThirdPartyPaymentHandler, hibernate_after: :timer.seconds(15)},"
+                 "{MyApp.Handlers.ThirdPartyPaymentHandler, hibernate_after: :timer.seconds(15)}"
 
         assert file =~
-                 "{MyApp.Processes.RegistrationProcessManager, hibernate_after: :timer.seconds(15)},"
+                 "{MyApp.Processes.RegistrationProcessManager, hibernate_after: :timer.seconds(15)}"
       end)
 
       # Install dependencies?
