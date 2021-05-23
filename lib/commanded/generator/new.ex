@@ -3,7 +3,15 @@ defmodule Commanded.Generator.New do
   use Commanded.Generator
 
   alias Commanded.Generator.{Model, Project}
-  alias Commanded.Generator.Model.{Aggregate, Command, Event, EventHandler, ProcessManager}
+
+  alias Commanded.Generator.Model.{
+    Aggregate,
+    Command,
+    Event,
+    EventHandler,
+    ProcessManager,
+    Projection
+  }
 
   template(:new, [
     {:eex, "commanded/config/config.exs", :project, "config/config.exs"},
@@ -14,6 +22,7 @@ defmodule Commanded.Generator.New do
     {:eex, "commanded/lib/app_name/app.ex", :project, "lib/:app/app.ex"},
     {:eex, "commanded/lib/app_name/application.ex", :project, "lib/:app/application.ex"},
     {:eex, "commanded/lib/app_name/event_store.ex", :project, "lib/:app/event_store.ex"},
+    {:eex, "commanded/lib/app_name/repo.ex", :project, "lib/:app/repo.ex"},
     {:eex, "commanded/lib/app_name/router.ex", :project, "lib/:app/router.ex"},
     {:eex, "commanded/lib/app_name.ex", :project, "lib/:app.ex"},
     {:eex, "commanded/test/test_helper.exs", :project, "test/test_helper.exs"},
@@ -41,6 +50,10 @@ defmodule Commanded.Generator.New do
   template(:process_manager, [
     {:eex, "process_manager/process_manager.ex", :project,
      "lib/:app/processes/:process_manager.ex"}
+  ])
+
+  template(:projection, [
+    {:eex, "projection/projector.ex", :project, "lib/:app/projections/:projector.ex"}
   ])
 
   def prepare_project(%Project{app: app} = project) when not is_nil(app) do
@@ -76,8 +89,8 @@ defmodule Commanded.Generator.New do
       model: %Model{
         aggregates: aggregates,
         event_handlers: event_handlers,
-        process_managers: process_managers
-        # projections: projections
+        process_managers: process_managers,
+        projections: projections
       }
     } = project
 
@@ -113,11 +126,22 @@ defmodule Commanded.Generator.New do
       copy_from(project, __MODULE__, :process_manager)
     end
 
+    for projection <- projections do
+      project = Project.merge_binding(project, projection_binding(projection))
+
+      copy_from(project, __MODULE__, :projection)
+    end
+
     project
   end
 
   defp new_project_binding(%Project{model: nil} = project) do
-    Project.merge_binding(project, aggregates: [], event_handlers: [], process_managers: [])
+    Project.merge_binding(project,
+      aggregates: [],
+      event_handlers: [],
+      process_managers: [],
+      projections: []
+    )
   end
 
   defp new_project_binding(%Project{} = project) do
@@ -125,14 +149,16 @@ defmodule Commanded.Generator.New do
       model: %Model{
         aggregates: aggregates,
         event_handlers: event_handlers,
-        process_managers: process_managers
+        process_managers: process_managers,
+        projections: projections
       }
     } = project
 
     Project.merge_binding(project,
       aggregates: Enum.map(aggregates, &Enum.into(aggregate_binding(&1), %{})),
       event_handlers: Enum.map(event_handlers, &Enum.into(event_handler_binding(&1), %{})),
-      process_managers: Enum.map(process_managers, &Enum.into(process_manager_binding(&1), %{}))
+      process_managers: Enum.map(process_managers, &Enum.into(process_manager_binding(&1), %{})),
+      projections: Enum.map(projections, &Enum.into(projection_binding(&1), %{}))
     )
   end
 
@@ -231,6 +257,31 @@ defmodule Commanded.Generator.New do
       process_manager_name: name,
       process_manager_namespace: namespace,
       process_manager_module: module,
+      events:
+        Enum.map(events, fn %Event{} = event ->
+          %Event{name: name, module: module, fields: fields} = event
+
+          {namespace, module} = module_parts(module)
+
+          %{name: name, module: module, namespace: namespace, fields: fields}
+        end)
+    ]
+  end
+
+  defp projection_binding(%Projection{} = projection) do
+    %Projection{events: events, module: module, name: name} = projection
+
+    {namespace, module} = module_parts(module)
+
+    projector_module = "#{module}Projector"
+
+    [
+      projection: Macro.underscore(module),
+      projection_name: name,
+      projection_namespace: namespace,
+      projection_module: module,
+      projector: Macro.underscore(projector_module),
+      projector_module: projector_module,
       events:
         Enum.map(events, fn %Event{} = event ->
           %Event{name: name, module: module, fields: fields} = event

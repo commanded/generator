@@ -33,7 +33,10 @@ defmodule <%= @app_module %>.MixProject do
   defp deps do
     [
       <%= @commanded_dep %>,
+      {:commanded_ecto_projections, "~> 1.2"},
       {:commanded_eventstore_adapter, "~> 1.2"},
+      {:ecto, "~> 3.6"},
+      {:ecto_sql, "~> 3.6"},
       {:eventstore, "~> 1.2"},
       {:jason, "~> 1.2"}
     ]
@@ -47,7 +50,7 @@ defmodule <%= @app_module %>.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "event_store.setup"],
+      setup: ["deps.get", "ecto.create", "event_store.setup"],
       "event_store.setup": ["event_store.create", "event_store.init"],
       "event_store.reset": ["event_store.drop", "event_store.setup"]
     ]

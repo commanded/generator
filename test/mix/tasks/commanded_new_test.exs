@@ -260,6 +260,48 @@ defmodule Mix.Tasks.Commanded.NewTest do
                  """
       end)
 
+      # Projections
+      assert_file("my_app/lib/my_app/projections/conference_summary_projector.ex", fn file ->
+        assert file =~ "defmodule MyApp.Projections.ConferenceSummaryProjector do"
+        assert file =~ "@moduledoc \"\"\"\n  Conference Summary Projector."
+
+        assert file =~
+                 """
+                   use Commanded.Projections.Ecto,
+                     application: MyApp.App,
+                     repo: MyApp.Repo,
+                     name: __MODULE__,
+                     start_from: :origin
+                 """
+
+        assert file =~
+                 """
+                   alias MyApp.Conference.Events.{
+                     ConferenceCreated,
+                     ConferencePublished,
+                     ConferenceUnpublished,
+                     ConferenceUpdated,
+                     SeatCreated,
+                     SeatDeleted
+                   }
+                 """
+
+        assert file =~
+                 """
+                   project(%ConferenceCreated{}, _metadata, fn multi ->
+                     multi
+                   end)
+                 """
+
+        assert file =~
+                 """
+                   @impl Commanded.Event.Handler
+                   def error(_error, _failed_event, _failure_context) do
+                     :skip
+                   end
+                 """
+      end)
+
       # Commanded Router module
       assert_file("my_app/lib/my_app/router.ex", fn file ->
         assert file =~ "defmodule MyApp.Router do"
@@ -314,10 +356,24 @@ defmodule Mix.Tasks.Commanded.NewTest do
       # Elixir Application module
       assert_file("my_app/lib/my_app/application.ex", fn file ->
         assert file =~
-                 "{MyApp.Handlers.ThirdPartyPaymentHandler, hibernate_after: :timer.seconds(15)}"
+                 """
+                    children = [
+                       # Start the Commanded application
+                       MyApp.App,
 
-        assert file =~
-                 "{MyApp.Processes.RegistrationProcessManager, hibernate_after: :timer.seconds(15)}"
+                       # Start the Ecto Repo
+                       MyApp.Repo,
+
+                       # Start event handlers
+                       {MyApp.Handlers.ThirdPartyPaymentHandler, hibernate_after: :timer.seconds(15)},
+
+                       # Start process managers
+                       {MyApp.Processes.RegistrationProcessManager, hibernate_after: :timer.seconds(15)},
+
+                       # Start read model projectors
+                       {MyApp.Projections.ConferenceSummaryProjector, hibernate_after: :timer.seconds(15)}
+                     ]
+                 """
       end)
 
       # Install dependencies?
@@ -348,7 +404,12 @@ defmodule Mix.Tasks.Commanded.NewTest do
 
     # Configuration files
     assert_file("my_app/config/config.exs", fn file ->
-      assert file =~ "config :my_app, event_stores: [MyApp.EventStore]"
+      assert file =~
+               """
+               config :my_app,
+                 ecto_repos: [MyApp.Repo],
+                 event_stores: [MyApp.EventStore]
+               """
     end)
 
     assert_file("my_app/config/dev.exs")
@@ -385,7 +446,13 @@ defmodule Mix.Tasks.Commanded.NewTest do
     # Eventstore module
     assert_file("my_app/lib/my_app/event_store.ex", fn file ->
       assert file =~ "defmodule MyApp.EventStore do"
-      assert file =~ "use EventStore,\n    otp_app: :my_app"
+
+      assert file =~
+               """
+                 use EventStore,
+                   otp_app: :my_app,
+                   serializer: Commanded.Serialization.JsonSerializer
+               """
     end)
 
     assert_file("my_app/lib/my_app.ex", ~r/defmodule MyApp do/)
@@ -394,6 +461,7 @@ defmodule Mix.Tasks.Commanded.NewTest do
       assert file =~ "mod: {MyApp.Application, []}"
       assert file =~ "{:jason, \"~> 1.2\"}"
       assert file =~ "{:commanded,"
+      assert file =~ "{:commanded_ecto_projections,"
       assert file =~ "{:commanded_eventstore_adapter,"
       assert file =~ "{:eventstore,"
     end)
