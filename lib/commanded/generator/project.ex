@@ -39,6 +39,12 @@ defmodule Commanded.Generator.Project do
     %Project{project | binding: Keyword.merge(binding, new_binding)}
   end
 
+  def put_binding(%Project{} = project, key, value) do
+    %Project{binding: binding} = project
+
+    %Project{project | binding: Keyword.put(binding, key, value)}
+  end
+
   def build_model(%Project{} = project, source, args) do
     {:ok, model} = source.build(args)
 

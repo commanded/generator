@@ -25,6 +25,8 @@ defmodule Commanded.Generator.New do
     {:eex, "commanded/lib/app_name/repo.ex", :project, "lib/:app/repo.ex"},
     {:eex, "commanded/lib/app_name/router.ex", :project, "lib/:app/router.ex"},
     {:eex, "commanded/lib/app_name.ex", :project, "lib/:app.ex"},
+    {:eex, "commanded/priv/repo/migrations/create_projection_versions.exs", :project,
+     "priv/repo/migrations/:projection_versions_migration_timestamp.exs"},
     {:eex, "commanded/test/test_helper.exs", :project, "test/test_helper.exs"},
     {:eex, "commanded/formatter.exs", :project, ".formatter.exs"},
     {:eex, "commanded/mix.exs", :project, "mix.exs"},
@@ -75,7 +77,13 @@ defmodule Commanded.Generator.New do
   end
 
   def generate(%Project{} = project) do
-    project = new_project_binding(project)
+    project =
+      project
+      |> new_project_binding()
+      |> Project.put_binding(
+        :projection_versions_migration_timestamp,
+        timestamp() <> "_create_projection_versions"
+      )
 
     copy_from(project, __MODULE__, :new)
 
@@ -300,4 +308,12 @@ defmodule Commanded.Generator.New do
 
     {namespace, module}
   end
+
+  defp timestamp do
+    {{y, m, d}, {hh, mm, ss}} = :calendar.universal_time()
+    "#{y}#{pad(m)}#{pad(d)}#{pad(hh)}#{pad(mm)}#{pad(ss)}"
+  end
+
+  defp pad(i) when i < 10, do: <<?0, ?0 + i>>
+  defp pad(i), do: to_string(i)
 end

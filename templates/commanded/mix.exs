@@ -50,7 +50,7 @@ defmodule <%= @app_module %>.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.create", "event_store.setup"],
+      setup: ["deps.get", "ecto.create", "ecto.migrate", "event_store.setup"],
       "event_store.setup": ["event_store.create", "event_store.init"],
       "event_store.reset": ["event_store.drop", "event_store.setup"]
     ]
