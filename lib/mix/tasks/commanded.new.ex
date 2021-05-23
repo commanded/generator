@@ -6,20 +6,14 @@ defmodule Mix.Tasks.Commanded.New do
 
       mix commanded.new PATH [--module MODULE] [--app APP]
 
-  A project at the given PATH will be created. The
-  application name and module name will be retrieved
-  from the path, unless `--module` or `--app` is given.
+  A project at the given PATH will be created. The application name and module
+  name will be retrieved from the path, unless `--module` or `--app` is given.
 
   ## Options
 
     * `--app` - the name of the OTP application
 
     * `--module` - the name of the base module in the generated skeleton
-
-    * `--no-projections` - do not generate support for read model projections
-      using Commanded Ecto projections
-
-    * `--binary-id` - use `binary_id` as primary key type
 
     * `--verbose` - use verbose output
 
@@ -29,11 +23,11 @@ defmodule Mix.Tasks.Commanded.New do
 
     * `--miro` - the Miro board id used to scaffold the Commanded application
 
-  ## Installation
+  ## Usage
 
   `mix commanded.new` by default prompts you to fetch and install your
-  dependencies. You can enable this behaviour by passing the
-  `--install` flag or disable it with the `--no-install` flag.
+  dependencies. You can enable this behaviour by passing the `--install` flag or
+  disable it with the `--no-install` flag.
 
   ## Examples
 
@@ -43,9 +37,9 @@ defmodule Mix.Tasks.Commanded.New do
 
       mix commanded.new hello_world --module HelloWorld
 
-  Or without support for read model projections
+  Scaffold an application from a Miro board:
 
-      mix commanded.new hello_world --no-projections
+      mix commanded.new hello_world --miro o9J_lDnyq6U=
 
   """
 

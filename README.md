@@ -1,21 +1,28 @@
-# Commanded.Generator
+# Commanded Generator
 
-**TODO: Add description**
+Mix task to create a new Commanded project.
 
-## Installation
+The task will create a new Elixir application configured to use Commanded,
+EventStore, Commanded Ecto projections, and Ecto.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `commanded_generator` to your list of dependencies in `mix.exs`:
+You will need to clone this repository to use the `commanded.new` Mix task.
 
-```elixir
-def deps do
-  [
-    {:commanded_generator, "~> 0.1.0"}
-  ]
-end
+```shell
+git clone git@github.com:commanded/generator.git commanded_generator
+cd commanded_generator
+mix do deps.get, compile
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/commanded_generator](https://hexdocs.pm/commanded_generator).
+## Usage
 
+```shell
+mix commanded.new PATH [--module MODULE] [--app APP]
+```
+
+It expects the path of the project as an argument.
+
+### Scaffold a project from a Miro board
+
+```shell
+mix commanded.new PATH --miro BOARD_ID
+```
