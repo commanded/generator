@@ -174,7 +174,8 @@ defmodule Mix.Tasks.Commanded.NewTest do
         assert file =~
                  """
                    @type t :: %ConferenceCreated{
-                           conference_id: String.t()
+                           conference_id: String.t(),
+                           version: pos_integer()
                          }
                  """
 
@@ -182,7 +183,8 @@ defmodule Mix.Tasks.Commanded.NewTest do
                  """
                    @derive Jason.Encoder
                    defstruct [
-                     :conference_id
+                     :conference_id,
+                     version: 1
                    ]
                  """
       end)
