@@ -304,6 +304,20 @@ defmodule Mix.Tasks.Commanded.NewTest do
                  """
       end)
 
+      assert_file("my_app/lib/my_app/projections/conference_summary.ex", fn file ->
+        assert file =~ "defmodule MyApp.Projections.ConferenceSummary do"
+        assert file =~ "@moduledoc \"\"\"\n  Conference Summary."
+
+        assert file =~ "use Ecto.Schema"
+
+        assert file =~
+                 """
+                   schema "conference_summary" do
+                     # Fields ...
+                   end
+                 """
+      end)
+
       # Commanded Router module
       assert_file("my_app/lib/my_app/router.ex", fn file ->
         assert file =~ "defmodule MyApp.Router do"

@@ -55,7 +55,8 @@ defmodule Commanded.Generator.New do
   ])
 
   template(:projection, [
-    {:eex, "projection/projector.ex", :project, "lib/:app/projections/:projector.ex"}
+    {:eex, "projection/projector.ex", :project, "lib/:app/projections/:projector.ex"},
+    {:eex, "projection/projection.ex", :project, "lib/:app/projections/:projection.ex"}
   ])
 
   def prepare_project(%Project{app: app} = project) when not is_nil(app) do
@@ -288,6 +289,7 @@ defmodule Commanded.Generator.New do
       projection_name: name,
       projection_namespace: namespace,
       projection_module: module,
+      projection_table: Macro.underscore(module),
       projector: Macro.underscore(projector_module),
       projector_module: projector_module,
       events:
