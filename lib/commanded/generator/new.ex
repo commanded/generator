@@ -9,6 +9,7 @@ defmodule Commanded.Generator.New do
     Command,
     Event,
     EventHandler,
+    ExternalSystem,
     ProcessManager,
     Projection
   }
@@ -47,6 +48,11 @@ defmodule Commanded.Generator.New do
 
   template(:event_handler, [
     {:eex, "event_handler/event_handler.ex", :project, "lib/:app/handlers/:event_handler.ex"}
+  ])
+
+  template(:external_system, [
+    {:eex, "external_system/external_system.ex", :project,
+     "lib/:app/external_systems/:external_system.ex"}
   ])
 
   template(:process_manager, [
@@ -98,6 +104,7 @@ defmodule Commanded.Generator.New do
       model: %Model{
         aggregates: aggregates,
         event_handlers: event_handlers,
+        external_systems: external_systems,
         process_managers: process_managers,
         projections: projections
       }
@@ -129,6 +136,12 @@ defmodule Commanded.Generator.New do
       copy_from(project, __MODULE__, :event_handler)
     end
 
+    for external_system <- external_systems do
+      project = Project.merge_binding(project, external_system_binding(external_system))
+
+      copy_from(project, __MODULE__, :external_system)
+    end
+
     for process_manager <- process_managers do
       project = Project.merge_binding(project, process_manager_binding(process_manager))
 
@@ -148,6 +161,7 @@ defmodule Commanded.Generator.New do
     Project.merge_binding(project,
       aggregates: [],
       event_handlers: [],
+      external_systems: [],
       process_managers: [],
       projections: []
     )
@@ -158,6 +172,7 @@ defmodule Commanded.Generator.New do
       model: %Model{
         aggregates: aggregates,
         event_handlers: event_handlers,
+        external_systems: external_systems,
         process_managers: process_managers,
         projections: projections
       }
@@ -166,6 +181,7 @@ defmodule Commanded.Generator.New do
     Project.merge_binding(project,
       aggregates: Enum.map(aggregates, &Enum.into(aggregate_binding(&1), %{})),
       event_handlers: Enum.map(event_handlers, &Enum.into(event_handler_binding(&1), %{})),
+      external_systems: Enum.map(external_systems, &Enum.into(external_system_binding(&1), %{})),
       process_managers: Enum.map(process_managers, &Enum.into(process_manager_binding(&1), %{})),
       projections: Enum.map(projections, &Enum.into(projection_binding(&1), %{}))
     )
@@ -245,6 +261,27 @@ defmodule Commanded.Generator.New do
       event_handler_name: name,
       event_handler_namespace: namespace,
       event_handler_module: module,
+      events:
+        Enum.map(events, fn %Event{} = event ->
+          %Event{name: name, module: module, fields: fields} = event
+
+          {namespace, module} = module_parts(module)
+
+          %{name: name, module: module, namespace: namespace, fields: fields}
+        end)
+    ]
+  end
+
+  defp external_system_binding(%ExternalSystem{} = external_system) do
+    %ExternalSystem{events: events, module: module, name: name} = external_system
+
+    {namespace, module} = module_parts(module)
+
+    [
+      external_system: Macro.underscore(module),
+      external_system_name: name,
+      external_system_namespace: namespace,
+      external_system_module: module,
       events:
         Enum.map(events, fn %Event{} = event ->
           %Event{name: name, module: module, fields: fields} = event
