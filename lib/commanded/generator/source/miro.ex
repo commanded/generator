@@ -6,6 +6,7 @@ defmodule Commanded.Generator.Source.Miro do
     Command,
     Event,
     EventHandler,
+    ExternalSystem,
     Field,
     ProcessManager,
     Projection
@@ -28,6 +29,7 @@ defmodule Commanded.Generator.Source.Miro do
         |> include_aggregates(widgets)
         |> include_events(widgets)
         |> include_event_handlers(widgets)
+        |> include_external_systems(widgets)
         |> include_process_managers(widgets)
         |> include_projections(widgets)
 
@@ -68,7 +70,7 @@ defmodule Commanded.Generator.Source.Miro do
               {name, fields} = parse_text(text)
 
               command =
-                case Model.find_command(model, name) do
+                case Model.find_command(model, module, name) do
                   %Command{} = command -> command
                   nil -> Command.new(Module.concat([module, Commands]), name, fields)
                 end
@@ -76,6 +78,7 @@ defmodule Commanded.Generator.Source.Miro do
               Aggregate.add_command(aggregate, command)
 
             is_a?(sticker, :event) ->
+              {name, fields} = parse_text(sticker["text"])
               include_aggregate_event(model, aggregate, sticker, widgets, [sticker])
 
             true ->
@@ -108,14 +111,14 @@ defmodule Commanded.Generator.Source.Miro do
     {name, fields} = parse_text(text)
 
     event =
-      case Model.find_event(model, name) do
+      case Model.find_event(model, module, name) do
         %Event{} = event -> event
         nil -> Event.new(Module.concat([module, Events]), name, fields)
       end
 
     aggregate = Aggregate.add_event(aggregate, event)
 
-    # Inclue any events connected to this event
+    # Include any events connected to this event
     widgets
     |> connected_to(id, "sticker", &is_a?(&1, :event))
     |> Enum.reject(&Enum.member?(accumulator, &1))
@@ -128,6 +131,8 @@ defmodule Commanded.Generator.Source.Miro do
   defp include_events(%Model{} = model, widgets) do
     %Model{events: events, namespace: namespace} = model
 
+    namespace = Module.concat([namespace, Events])
+
     new_events =
       widgets
       |> typeof("sticker", &is_a?(&1, :event))
@@ -137,14 +142,12 @@ defmodule Commanded.Generator.Source.Miro do
         parse_text(text)
       end)
       |> Enum.reject(fn {name, _fields} ->
-        case Model.find_event(model, name) do
+        case Model.find_event(model, namespace, name) do
           %Event{} -> true
           nil -> false
         end
       end)
       |> Enum.map(fn {name, fields} ->
-        namespace = Module.concat([namespace, Events])
-
         Event.new(namespace, name, fields)
       end)
 
@@ -178,6 +181,36 @@ defmodule Commanded.Generator.Source.Miro do
         Enum.reduce(referenced_events, event_handler, &EventHandler.add_event(&2, &1))
 
       Model.add_event_handler(model, event_handler)
+    end)
+  end
+
+  defp include_external_systems(%Model{} = model, widgets) do
+    %Model{namespace: namespace} = model
+
+    widgets
+    |> typeof("sticker", &is_a?(&1, :external_system))
+    |> Enum.reduce(model, fn sticker, model ->
+      %{"id" => id, "text" => text} = sticker
+
+      {name, _fields} = parse_text(text)
+
+      module = Module.concat([namespace, ExternalSystems, String.replace(name, " ", "")])
+
+      external_system =
+        case Model.find_external_system(model, name) do
+          %ExternalSystem{} = external_system ->
+            external_system
+
+          nil ->
+            %ExternalSystem{name: name, module: module}
+        end
+
+      referenced_events = referenced_events(model, widgets, id)
+
+      external_system =
+        Enum.reduce(referenced_events, external_system, &ExternalSystem.add_event(&2, &1))
+
+      Model.add_external_system(model, external_system)
     end)
   end
 
@@ -241,14 +274,46 @@ defmodule Commanded.Generator.Source.Miro do
   end
 
   defp referenced_events(%Model{} = model, widgets, id) do
+    %Model{namespace: namespace} = model
+
     widgets
     |> connected_to(id, "sticker", &is_a?(&1, :event))
     |> Enum.reduce([], fn sticker, acc ->
       %{"text" => text} = sticker
-
       {name, _fields} = parse_text(text)
+      aggregate_source = connected_to(widgets, sticker["id"], "sticker", &is_a?(&1, :aggregate))
 
-      case Model.find_event(model, name) do
+      external_source =
+        connected_to(widgets, sticker["id"], "sticker", &is_a?(&1, :external_system))
+
+      # all_sources = connected_to(widgets, sticker["id"], "sticker")
+
+      sources = [{:aggregate, aggregate_source}, {:external_system, external_source}]
+      matcher = fn {src, widgets} -> length(widgets) > 0 end
+
+      module =
+        case Enum.find(sources, matcher) do
+          {:aggregate, [agg]} ->
+            {agg_name, _fields} = parse_text(agg["text"])
+
+            case Model.find_aggregate(model, agg_name) do
+              %Aggregate{module: module} = aggregate ->
+                aggregate
+
+              nil ->
+                raise "BOOM can't find aggregate with name: #{agg_name}"
+            end
+
+          {:external_system, [ext]} ->
+            {ext_name, _fields} = parse_text(ext["text"])
+
+            module = Module.concat([namespace, ExternalSystems, String.replace(name, " ", "")])
+
+          {source, widgets} ->
+            raise "Found more than one source for event #{name}"
+        end
+
+      case Model.find_event(model, module, name) do
         %Event{} = event -> [event | acc]
         nil -> acc
       end
@@ -260,6 +325,7 @@ defmodule Commanded.Generator.Source.Miro do
   defp is_a?(%{"style" => %{"backgroundColor" => "#a6ccf5"}}, :command), do: true
   defp is_a?(%{"style" => %{"backgroundColor" => "#ff9d48"}}, :event), do: true
   defp is_a?(%{"style" => %{"backgroundColor" => "#ea94bb"}}, :event_handler), do: true
+  defp is_a?(%{"style" => %{"backgroundColor" => "#ffcee0"}}, :external_system), do: true
   defp is_a?(%{"style" => %{"backgroundColor" => "#be88c7"}}, :process_manager), do: true
   defp is_a?(%{"style" => %{"backgroundColor" => "#d5f692"}}, :projection), do: true
   defp is_a?(_widget, _type), do: false
